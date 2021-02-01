@@ -39,7 +39,13 @@ void setup() {
 
 void loop() {
   // read the value from the sensor:
+  uint32_t t1= micros();
   sensorValue = analogRead(sensorPin);
+  uint32_t t2= micros();
 //  V = sensorValue*5.0/1023;
-  Serial.println(sensorValue);
+//  Serial.print("time: ");
+  Serial.print(t2-t1);
+  Serial.print(",");
+  Serial.print(sensorValue);
+  Serial.println();
 }

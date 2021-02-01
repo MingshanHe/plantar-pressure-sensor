@@ -13,9 +13,13 @@ every_time = time.strftime('%Y-%m-%d %H:%M:%S')# 时间戳\
 time_start = time.time()
 # data = ''
 data_list = []
-while True:
+i = 1
+while i == 1:
   data = ser.readline()
-  data = data.decode()
+  data = data.decode('utf-8','ignore')
 #   intdata = int.from_bytes(data, byteorder='big', signed = False)
   now_time = time.time()
-  print(now_time-time_start,": ", data)
+  print(now_time-time_start,": ", data,len(data))
+  for i in data:
+    print(i)
+  i = 2
