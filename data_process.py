@@ -5,48 +5,32 @@ import os
 import time
 import serial
 
-# ser = serial.Serial(  # 下面这些参数根据情况修改
-#   port='COM13',# 串口
-#   baudrate=9600,# 波特率
-#   parity=serial.PARITY_ODD,
-#   stopbits=serial.STOPBITS_TWO,
-#   bytesize=serial.SEVENBITS
+time_start = time.time()
+def string_to_float(str):
+  return float(str)
 
-# )
-# every_time = time.strftime('%Y-%m-%d %H:%M:%S')# 时间戳\
-# # data = ''
-# data_list = []
-# time_start = 0
-# flag = True
-# while True:
-#   data = ser.readline()
-#   data = data.decode()
-# #   intdata = int.from_bytes(data, byteorder='big', signed = False)
-#   if flag:
-#     time_start = time.time()
-#     flag = False
-#   now_time = time.time()
-#   print(now_time-time_start,": ", data)
 def get_data_from_serial(ser, cut=','):
 
-    data = ser.readline()
-    data = data.decode()
-    num_list = []
-    n = len(data)
-    num_str1 = ''
-    num_str2 = ''
-    cut_flag = 0
-    for i in range(1,n-1):
-        if data[i] == cut:
-            cut_flag = 1
-            continue
-        if cut_flag:
-            num_str2 = num_str2+data[i]
-        else:
-            num_str1 = num_str1+data[i]
-    num_list.append(float(num_str1))
-    num_list.append(float(num_str2))
-    return num_list
+  data = ser.readline()
+  data = data.decode()
+  num_list = []
+  n = len(data)
+  num_str1 = ''
+  num_str2 = ''
+  cut_flag = 0
+  for i in range(1,n-1):
+      if data[i] == cut:
+          cut_flag = 1
+          continue
+      if cut_flag:
+          num_str2 = num_str2+data[i]
+      else:
+          num_str1 = num_str1+data[i]
+  now_time = time.time()
+  num_list.append(now_time-time_start)
+  num_str2 = string_to_float(num_str2)
+  num_list.append(num_str2)
+  return num_list
 
 def pre_csv_file(file_path='csv_file/save_csv.csv',csv_head=[],mode='new'):
   '''
