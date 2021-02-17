@@ -1,14 +1,23 @@
+# /*
+#  * @Author: MingshanHe
+#  * @Email: hemingshan@robotics.github.com
+#  * @Date: 2021-02-17 17:54:54
+#  * @Last Modified by:   MingshanHe
+#  * @Last Modified time: 2021-02-17 17:54:54
+#  * @Description: Description
+#  */
 import numpy as np
 import math
 import random
+from pre_labels_cases import *
 
 class Network(object):
     def __init__(self, ni, nh, no):
-        self.input_n = ni + 1
+        self.input_n = ni
         self.hidden_n = nh
         self.output_n = no
         # init cells
-        self.input_cells  = None
+        self.input_cells  = np.array([0.0]*self.input_n)
         self.hidden_cells = np.array([0.0]*self.hidden_n)
         self.output_cells = np.array([0.0]*self.output_n)
         # init weights
@@ -30,7 +39,6 @@ class Network(object):
         self.input_cells = inputs
         # activate hidden layer
         result = self.input_cells.dot(self.input_weights)
-        print(result)
         for i in range(self.hidden_n):
             self.hidden_cells[i] = self.sigmoid(result[i])
         # activate output layer
@@ -49,7 +57,7 @@ class Network(object):
             output_deltas[o] = self.sigmod_derivate(self.output_cells[o]) * error[o]
         # get hidden layer error
         hidden_deltas = np.array([0.0]*self.hidden_n)
-        result = output_deltas.dot(self.output_weights)
+        result = output_deltas.dot(self.output_weights.T)
         for h in range(self.hidden_n):
             hidden_deltas[h] = self.sigmod_derivate(self.hidden_cells[h]) * result[h]
         # update output weights
@@ -70,9 +78,21 @@ class Network(object):
             error += 0.5 * (label[o] - self.output_cells[o]) ** 2
         return error
 
-    def sigmoid(self,x):
-        return 1.0 / (1.0 + math.exp(-x))
+    def train(self, cases, labels, limit=10000, learn=0.05, correct=0.1):
+        for i in range(limit):
+            error = 0.0
+            for j in range(len(cases)):
+                label = labels[j]
+                case = cases[j]
+                error += self.back_propagate(case, label, learn, correct)
+            if i%100 == 0:
+                print("i: ",i," error: ",error,'output_label: ',self.output_cells)
 
+    def sigmoid(self,x):
+        try:
+            return 1.0 / (1.0 + math.exp(-x))
+        except OverflowError:
+            return 0
     def sigmod_derivate(self,x):
         return x * (1 - x)
 
@@ -84,6 +104,16 @@ class Network(object):
         return (b - a) * random.random() + a
 
 if __name__ == "__main__":
-    nn = Network(11,5,5)
-    print(nn.predict(np.array([1,1,1,1,1,1,1,1,1,1,1,1])))
-    print(nn.back_propagate(case=np.array([1,1,1,1,1,1,1,1,1,1,1,1]),label=np.array([1,1,1,1,1]),learn=0.05,correct=0.1))
+    # nn = Network(3,3,3)
+    # cases  = [np.array([1,0,0]),np.array([0,1,0]),np.array([0,0,1])]
+    # labels = [np.array([0,1,0]),np.array([0,0,1]),np.array([1,0,0])]
+    # nn.train(case,label)
+    nn = Network(10,10,3)
+
+    cases,labels = pre_labels_cases()
+    nn.train(cases,labels,limit=500,learn=0.1)
+    print(nn.input_weights)
+    print(nn.output_weights)
+    for i in range(len(cases)):
+        print(nn.predict(cases[i]),labels[i])
+        
